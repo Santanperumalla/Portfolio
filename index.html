@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SANTAN NARAYANA SAI PERUMALLA — Data Analyst</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --bg:#05070b; --panel:rgba(14,20,29,.72); --panel-2:rgba(20,28,40,.72);
+  --border:rgba(130,160,185,.18); --text:#eef7f8; --muted:#8e9eac;
+  --teal:#2dd4bf; --amber:#f5a623; --violet:#8b83ff; --cyan:#59e5ff;
+  --glass:rgba(255,255,255,.055); --radius:18px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:radial-gradient(circle at 50% -10%,#112b35 0%,var(--bg) 42%,#020306 100%);
+  color:var(--text);font-family:'Inter',sans-serif;line-height:1.6;overflow-x:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;
+  background:radial-gradient(circle at 15% 20%,rgba(45,212,191,.08),transparent 30%),
+             radial-gradient(circle at 85% 30%,rgba(139,131,255,.08),transparent 28%);
+}
+::selection{background:var(--teal);color:#031411}
+h1,h2,h3{font-family:'Space Grotesk',sans-serif;font-weight:600;letter-spacing:-.02em}
+.mono{font-family:'IBM Plex Mono',monospace}
+a{color:inherit;text-decoration:none}
+.container{max-width:1120px;margin:0 auto;padding:0 28px}
+
+/* Three.js canvas */
+#three-bg{position:fixed;inset:0;width:100%;height:100%;z-index:-10;pointer-events:none}
+.scene,.grid-bg,.dot-bg,.chart-bg{display:none}
+
+/* Navigation */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  background:rgba(4,7,11,.55);backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+  box-shadow:0 10px 40px rgba(0,0,0,.2)
+}
+nav .container{display:flex;align-items:center;justify-content:space-between;height:68px}
+.logo{font-family:'IBM Plex Mono',monospace;font-size:15px;color:var(--teal);font-weight:600}
+.logo span{color:var(--muted)}
+.nav-links{display:flex;gap:25px;font-size:13px;color:var(--muted)}
+.nav-links a{transition:.25s}
+.nav-links a:hover{color:var(--teal);text-shadow:0 0 16px rgba(45,212,191,.5)}
+@media(max-width:720px){.nav-links{display:none}}
+
+/* Banner */
+.banner{
+  position:relative;width:100%;height:245px;margin-top:68px;overflow:hidden;
+  border-bottom:1px solid rgba(255,255,255,.08);transform-style:preserve-3d
+}
+.banner img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.1) brightness(.68)}
+.banner::before{
+  content:"";position:absolute;inset:0;z-index:1;
+  background:linear-gradient(90deg,rgba(3,8,12,.55),transparent 50%,rgba(3,8,12,.55))
+}
+.banner::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(5,7,11,.05),var(--bg) 100%)
+}
+.profile-wrap{display:flex;justify-content:center;margin-top:-78px;position:relative;z-index:10;perspective:1000px}
+.profile-photo{
+  width:150px;height:150px;border-radius:50%;overflow:hidden;
+  border:4px solid var(--bg);box-shadow:0 0 0 2px var(--teal),0 30px 80px rgba(0,0,0,.75),inset 0 0 30px rgba(45,212,191,.2);
+  background:var(--panel);transform:translateZ(30px);transition:.5s
+}
+.profile-photo:hover{transform:translateZ(55px) rotateY(8deg) rotateX(-5deg)}
+.profile-photo img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* Universal 3D surface */
+.hero,.project-card,.cert-item,.terminal,.schema,.fact-list li,.timeline-item,.edu-item,.resume-preview,.banner{
+  transform-style:preserve-3d
+}
+.hero{padding:42px 0 100px;display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;
+  color:var(--teal);border:1px solid rgba(45,212,191,.3);background:rgba(45,212,191,.06);
+  padding:7px 13px;border-radius:30px;margin-bottom:22px;box-shadow:0 10px 30px rgba(45,212,191,.08)
+}
+.eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal);box-shadow:0 0 12px var(--teal)}
+.hero h1{font-size:48px;line-height:1.08;margin-bottom:15px;text-shadow:0 15px 35px rgba(0,0,0,.55)}
+.hero h1 .last{color:var(--teal)}
+.hero p.tagline{color:var(--muted);font-size:17px;max-width:520px;margin-bottom:30px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.btn{
+  font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:500;padding:12px 20px;border-radius:10px;
+  display:inline-flex;align-items:center;gap:8px;transition:.25s;border:1px solid transparent;cursor:pointer;
+  transform:translateZ(20px);box-shadow:0 12px 28px rgba(0,0,0,.3)
+}
+.btn-primary{background:linear-gradient(135deg,#2dd4bf,#22a997);color:#04211d}
+.btn-primary:hover{transform:translateZ(30px) translateY(-4px) rotateX(4deg);box-shadow:0 22px 45px rgba(45,212,191,.22)}
+.btn-outline{border-color:var(--border);background:rgba(255,255,255,.035);color:var(--text);backdrop-filter:blur(10px)}
+.btn-outline:hover{border-color:var(--teal);color:var(--teal);transform:translateZ(30px) translateY(-4px)}
+.contact-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px;font-size:13.5px;color:var(--muted)}
+.contact-row a:hover{color:var(--teal)}
+.contact-icon{margin-right:6px;color:var(--teal)}
+
+/* Glass terminal */
+.terminal{
+  position:relative;background:linear-gradient(145deg,rgba(24,34,47,.82),rgba(7,11,16,.75));
+  border:1px solid rgba(255,255,255,.12);border-radius:18px;
+  box-shadow:30px 35px 80px rgba(0,0,0,.65),inset 1px 1px 0 rgba(255,255,255,.08);
+  overflow:hidden;transition:transform .25s ease
+}
+.terminal::before,.project-card::before,.cert-item::before,.schema::before,.fact-list li::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(135deg,rgba(255,255,255,.09),transparent 35%,transparent 70%,rgba(45,212,191,.045));
+  transform:translateZ(1px)
+}
+.terminal-head{display:flex;align-items:center;gap:8px;padding:12px 16px;background:rgba(255,255,255,.035);border-bottom:1px solid var(--border)}
+.dot{width:10px;height:10px;border-radius:50%}.dot.r{background:#ff5f57}.dot.y{background:#febc2e}.dot.g{background:#28c840}
+.terminal-title{margin-left:8px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted)}
+.terminal-body{padding:22px;font-family:'IBM Plex Mono',monospace;font-size:13px;min-height:280px}
+.prompt{color:var(--teal)}.query{color:#d7dee5;white-space:pre-wrap}
+.cursor{display:inline-block;width:7px;height:14px;background:var(--teal);vertical-align:middle;animation:blink 1s step-start infinite}
+@keyframes blink{50%{opacity:0}}
+table.result{width:100%;border-collapse:collapse;margin-top:16px;font-size:12.5px;opacity:0;animation:fadeIn .5s ease forwards;animation-delay:2.6s}
+@keyframes fadeIn{to{opacity:1}}
+table.result th{text-align:left;color:var(--amber);padding:6px 10px;border-bottom:1px solid var(--border)}
+table.result td{padding:6px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:#c9d2db}
+table.result td.val{color:var(--teal)}
+.iso-chart{position:absolute;top:-18px;right:14px;display:flex;align-items:flex-end;gap:9px;z-index:3;pointer-events:none;transform:rotateX(8deg) rotateY(-8deg);transform-style:preserve-3d}
+.iso-bar{width:16px;border-radius:3px;background:linear-gradient(180deg,var(--teal),rgba(45,212,191,.2));box-shadow:7px 9px 0 rgba(139,131,255,.22),7px 9px 18px rgba(0,0,0,.5);animation:barFloat 3.6s ease-in-out infinite}
+.iso-bar.b2{background:linear-gradient(180deg,var(--violet),rgba(139,131,255,.2));animation-delay:.25s}
+.iso-bar.b3{animation-delay:.5s}.iso-bar.b4{background:linear-gradient(180deg,var(--amber),rgba(245,166,35,.2));animation-delay:.75s}.iso-bar.b5{animation-delay:1s}
+@keyframes barFloat{0%,100%{transform:translateY(0) translateZ(0)}50%{transform:translateY(-9px) translateZ(8px)}}
+
+/* Sections */
+section{padding:95px 0;position:relative}
+.section-head{margin-bottom:44px}
+.section-tag{font-family:'IBM Plex Mono',monospace;color:var(--amber);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.section-head h2{font-size:31px;margin-top:8px;text-shadow:0 10px 30px rgba(0,0,0,.5)}
+.section-line{height:1px;background:linear-gradient(to right,var(--border),transparent);margin-top:18px}
+
+/* 3D About */
+.about-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:50px}
+.about-grid p{color:#c3ccd6;font-size:15.5px;margin-bottom:16px}
+.fact-list{list-style:none;display:flex;flex-direction:column;gap:14px;perspective:1000px}
+.fact-list li{
+  position:relative;display:flex;justify-content:space-between;padding:14px 16px;
+  background:linear-gradient(135deg,rgba(20,29,40,.76),rgba(7,11,16,.65));border:1px solid var(--border);border-radius:12px;
+  font-size:13.5px;box-shadow:14px 18px 35px rgba(0,0,0,.32);transition:.3s
+}
+.fact-list li:hover{transform:translateZ(18px) rotateX(2deg) rotateY(-2deg);border-color:rgba(45,212,191,.38)}
+.fact-list li .k{color:var(--muted);font-family:'IBM Plex Mono',monospace;font-size:12px}.fact-list li .v{color:var(--text);font-weight:500}
+
+/* Skills */
+.schema{
+  position:relative;border:1px solid var(--border);border-radius:16px;overflow:hidden;
+  box-shadow:25px 30px 70px rgba(0,0,0,.4);background:rgba(8,13,19,.5);backdrop-filter:blur(14px)
+}
+.schema-row{display:grid;grid-template-columns:200px 1fr;border-bottom:1px solid var(--border)}
+.schema-row:last-child{border-bottom:none}
+.schema-key{padding:19px 20px;background:rgba(255,255,255,.035);font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--amber);display:flex;align-items:center}
+.schema-val{padding:18px 20px;background:rgba(8,13,19,.48);display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tag{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#cfe9e5;background:rgba(45,212,191,.08);border:1px solid rgba(45,212,191,.25);padding:5px 11px;border-radius:7px;transition:.25s;transform:translateZ(8px)}
+.tag:hover{transform:translateZ(20px) translateY(-3px);border-color:var(--teal);box-shadow:0 10px 22px rgba(45,212,191,.15)}
+
+/* Projects — primary 3D focus */
+.projects{display:grid;grid-template-columns:repeat(2,1fr);gap:28px;perspective:1800px}
+.project-card{
+  position:relative;background:linear-gradient(145deg,rgba(20,30,42,.88),rgba(6,10,15,.82));
+  border:1px solid rgba(255,255,255,.11);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;
+  min-height:330px;box-shadow:20px 30px 65px rgba(0,0,0,.52),inset 1px 1px 0 rgba(255,255,255,.06);
+  transition:transform .2s ease,box-shadow .3s ease,border-color .3s ease;cursor:pointer;
+  will-change:transform
+}
+.project-card:hover{border-color:rgba(45,212,191,.48);box-shadow:35px 45px 90px rgba(0,0,0,.72),0 0 35px rgba(45,212,191,.08)}
+.project-card.expanded{grid-column:span 2}
+.card-strip{height:5px;background:linear-gradient(90deg,var(--teal),var(--violet),var(--amber));box-shadow:0 0 20px rgba(45,212,191,.25)}
+.card-body{padding:24px;display:flex;flex-direction:column;gap:13px;flex:1;position:relative}
+.card-body h3{font-size:18px;transform:translateZ(24px)}
+.card-body ul{padding-left:18px;color:#b7c1cc;font-size:13.5px;display:flex;flex-direction:column;gap:6px;transform:translateZ(14px)}
+.card-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:10px;transform:translateZ(18px)}
+.card-tags span{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);border:1px solid var(--border);padding:4px 8px;border-radius:6px;background:rgba(255,255,255,.025)}
+.card-link{display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;color:var(--teal);margin-top:6px;transform:translateZ(25px)}
+.card-link:hover{color:var(--amber)}
+.expand-btn{
+  position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--teal);display:grid;place-items:center;
+  transition:.3s;z-index:3
+}
+.project-card.expanded .expand-btn{transform:rotate(45deg);background:rgba(45,212,191,.12)}
+.project-extra{max-height:0;overflow:hidden;opacity:0;transform:translateZ(-20px);transition:max-height .55s ease,opacity .35s ease,transform .55s ease}
+.project-card.expanded .project-extra{max-height:220px;opacity:1;transform:translateZ(10px)}
+.project-extra p{font-size:13px;color:var(--muted);padding-top:5px;border-top:1px solid var(--border);margin-top:3px}
+.project-card[data-depth="1"]{transform:translateZ(0) rotateX(1deg)}
+.project-card[data-depth="2"]{transform:translateZ(15px) rotateX(-1deg)}
+.project-card[data-depth="3"]{transform:translateZ(30px) rotateX(1deg)}
+.project-card[data-depth="4"]{transform:translateZ(45px) rotateX(-1deg)}
+@media(max-width:700px){.projects{grid-template-columns:1fr}.project-card.expanded{grid-column:span 1}}
+
+/* Floating Query Slabs */
+.query-slabs{position:relative;height:500px;margin-top:30px;perspective:1500px;overflow:visible}
+.query-slab{
+  position:absolute;left:50%;top:50%;width:min(760px,90%);min-height:150px;padding:22px 26px;
+  background:linear-gradient(135deg,rgba(22,33,47,.78),rgba(5,9,14,.74));
+  border:1px solid rgba(255,255,255,.12);border-radius:18px;backdrop-filter:blur(18px);
+  box-shadow:0 30px 70px rgba(0,0,0,.55),inset 1px 1px 0 rgba(255,255,255,.08);
+  transform-style:preserve-3d;will-change:transform;transition:box-shadow .3s
+}
+.query-slab:nth-child(1){transform:translate(-50%,-50%) translateZ(80px) rotateX(8deg) rotateY(-10deg)}
+.query-slab:nth-child(2){transform:translate(-48%,-42%) translateZ(35px) rotateX(5deg) rotateY(8deg);opacity:.9}
+.query-slab:nth-child(3){transform:translate(-46%,-34%) translateZ(-10px) rotateX(-4deg) rotateY(-6deg);opacity:.78}
+.query-slab:nth-child(4){transform:translate(-44%,-26%) translateZ(-50px) rotateX(2deg) rotateY(9deg);opacity:.65}
+.query-slab .slab-index{font-family:'IBM Plex Mono';font-size:11px;color:var(--amber)}
+.query-slab h3{font-size:18px;margin:6px 0}
+.query-slab p{color:var(--muted);font-size:13px}
+.query-slab .slab-tech{margin-top:12px;color:var(--teal);font:11px 'IBM Plex Mono'}
+@media(max-width:700px){.query-slabs{height:410px}.query-slab{min-height:170px}}
+
+/* Timeline, education, certifications */
+.timeline{border-left:2px solid var(--border);padding-left:30px;display:flex;flex-direction:column;gap:38px;margin-left:6px}
+.timeline-item{position:relative;padding:20px;border:1px solid transparent;border-radius:14px;transition:.3s}
+.timeline-item:hover{border-color:var(--border);background:rgba(255,255,255,.025);transform:translateX(8px) translateZ(15px)}
+.timeline-item::before{content:'';position:absolute;left:-37px;top:24px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--teal);box-shadow:0 0 15px rgba(45,212,191,.5)}
+.timeline-item .date{font:12px 'IBM Plex Mono';color:var(--amber);margin-bottom:4px}
+.timeline-item h3{font-size:16.5px;margin-bottom:4px}.timeline-item .org{color:var(--muted);font-size:13.5px;margin-bottom:10px}
+.timeline-item ul{padding-left:18px;color:#b7c1cc;font-size:13.5px;display:flex;flex-direction:column;gap:6px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:50px}
+.edu-item{padding:18px;border:1px solid transparent;border-radius:14px;margin-bottom:5px;transition:.3s}
+.edu-item:hover{background:rgba(255,255,255,.025);border-color:var(--border);transform:translateZ(18px) rotateY(-1deg)}
+.edu-item h3{font-size:15.5px;margin-bottom:3px}.edu-item .meta{color:var(--muted);font-size:13px}.edu-item .score{font:13px 'IBM Plex Mono';color:var(--teal);margin-top:4px}
+.cert-list{display:flex;flex-direction:column;gap:12px;perspective:1200px}
+.cert-item{
+  position:relative;display:flex;align-items:center;gap:12px;padding:14px 16px;
+  background:linear-gradient(135deg,rgba(19,29,41,.82),rgba(7,11,16,.7));border:1px solid var(--border);border-radius:12px;font-size:13.5px;
+  box-shadow:14px 18px 38px rgba(0,0,0,.3);transition:.25s;will-change:transform
+}
+.cert-item:hover{border-color:rgba(45,212,191,.4);box-shadow:22px 28px 55px rgba(0,0,0,.5)}
+.cert-item .bullet{color:var(--amber);font-family:'IBM Plex Mono'}.cert-item .issuer{color:var(--muted);margin-left:auto;font-size:12px}
+.cert-item a.cert-link{color:var(--teal);font-family:'IBM Plex Mono';font-size:11.5px;margin-left:8px;white-space:nowrap}
+.cert-item a.cert-link:hover{color:var(--amber)}
+
+/* Resume + footer */
+.resume-block{display:grid;grid-template-columns:.9fr 1.1fr;gap:44px;align-items:center}
+.resume-preview{border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:30px 40px 80px rgba(0,0,0,.7);transition:.3s}
+.resume-preview:hover{transform:translateZ(30px) rotateY(-3deg) rotateX(2deg)}
+.resume-preview img{width:100%;display:block}
+footer{padding:70px 0 50px;border-top:1px solid var(--border);position:relative}
+.footer-grid{display:flex;justify-content:space-between;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.footer-links{display:flex;gap:22px;flex-wrap:wrap;font-size:13.5px}.footer-links a,.footer-links span{color:var(--muted)}.footer-links a:hover{color:var(--teal)}
+.footer-note{color:var(--muted);font-size:12px;margin-top:30px;font-family:'IBM Plex Mono',monospace}
+.icon-link i{font-size:16px;margin-right:5px}.location i{color:var(--teal);margin-right:6px}
+
+/* Scroll reveal */
+.reveal{opacity:0;transform:translateY(45px) translateZ(-30px);transition:opacity .8s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+.reveal.visible{opacity:1;transform:none}
+
+/* Motion safety */
+@media(max-width:860px){
+  .hero{grid-template-columns:1fr;padding-top:30px}.banner{height:170px}.profile-photo{width:115px;height:115px}
+  .about-grid,.two-col,.resume-block{grid-template-columns:1fr}
+}
+@media(max-width:640px){.schema-row{grid-template-columns:1fr}.schema-key{border-bottom:1px solid var(--border)}.hero h1{font-size:38px}}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  #three-bg{display:none}
+}
+</style>
+</head>
+<body>
+<canvas id="three-bg" aria-hidden="true"></canvas>
+
+<div class="scene"><div class="floor"></div></div>
+<div class="grid-bg"></div>
+<div class="dot-bg"></div>
+
+<nav>
+  <div class="container">
+    <div class="logo">SANTAN<span>.PERUMALLA</span></div>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#skills">Skills</a>
+      <a href="#projects">Projects</a>
+      <a href="#experience">Experience</a>
+      <a href="#resume">Resume</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<div class="banner">
+  <img src="banner-cover.jpg" alt="Data analytics banner">
+</div>
+<div class="profile-wrap">
+  <div class="profile-photo">
+    <img src="profile-photo.jpg" alt="Santan Narayana Sai Perumalla">
+  </div>
+</div>
+
+<header class="hero container">
+  <div>
+    <div class="eyebrow">fresher.status = "actively seeking data analyst roles"</div>
+    <h1>SANTAN NARAYANA SAI<br>PERUMALLA</h1>
+    <p class="tagline">Aspiring Data Analyst turning raw data into meaningful insights — with hands-on skills in Python, SQL, Power BI and Advanced Excel.</p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn btn-primary">View Projects →</a>
+      <a href="Santan_Perumalla_Resume.pdf" download class="btn btn-outline">Download Resume</a>
+    </div>
+    <div class="contact-row">
+      <a href="mailto:santhannarayanasai12@gmail.com"><i class="fa-solid fa-envelope contact-icon"></i>santhannarayanasai12@gmail.com</a>
+      <a class="icon-link" href="https://www.linkedin.com/in/santan-perumalla-813053252" target="_blank"><i class="fa-brands fa-linkedin"></i>LinkedIn</a>
+      <a class="icon-link" href="https://github.com/Santanperumalla" target="_blank"><i class="fa-brands fa-github"></i>GitHub</a>
+      <span class="location"><i class="fa-solid fa-location-dot"></i>Vijayawada, India</span>
+    </div>
+  </div>
+
+  <div class="terminal">
+    <div class="iso-chart">
+      <div class="iso-bar" style="height:36px;"></div>
+      <div class="iso-bar b2" style="height:58px;"></div>
+      <div class="iso-bar b3" style="height:28px;"></div>
+      <div class="iso-bar b4" style="height:70px;"></div>
+      <div class="iso-bar b5" style="height:46px;"></div>
+    </div>
+    <div class="terminal-head">
+      <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+      <span class="terminal-title">query — analyst_profile.sql</span>
+    </div>
+    <div class="terminal-body">
+<span class="prompt">analyst@portfolio:~$</span>
+<span class="query" id="typedQuery"></span><span class="cursor" id="cursorBlink"></span>
+      <table class="result" id="resultTable">
+        <tr><th>field</th><th>value</th></tr>
+        <tr><td>name</td><td class="val">SANTAN N. S. PERUMALLA</td></tr>
+        <tr><td>role</td><td class="val">Data Analyst (Fresher)</td></tr>
+        <tr><td>core_skills</td><td class="val">Python, SQL, Power BI, Excel</td></tr>
+        <tr><td>projects_completed</td><td class="val">5</td></tr>
+        <tr><td>location</td><td class="val">Vijayawada, IN</td></tr>
+        <tr><td>availability</td><td class="val">Immediate</td></tr>
+      </table>
+    </div>
+  </div>
+</header>
+
+<section id="about">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">01 · About</div>
+      <h2>Career Objective</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-grid">
+      <div>
+        <p>Aspiring Data Analyst with hands-on skills in Python, SQL, Power BI, Advanced Excel, and EDA. Seeking an entry-level opportunity to apply analytical skills, turn data into actionable insights, and support data-driven business decisions while continuously developing expertise in analytics and visualization.</p>
+        <p>My work spans building relational databases, cleaning and exploring datasets, and designing interactive Power BI dashboards that turn numbers into decisions — backed by internship exposure in networking and embedded systems.</p>
+      </div>
+      <ul class="fact-list">
+        <li><span class="k">EDUCATION</span><span class="v">B.E · ECE, 2025</span></li>
+        <li><span class="k">CGPA</span><span class="v">6.5 / 10</span></li>
+        <li><span class="k">LOCATION</span><span class="v">Vijayawada, India</span></li>
+        <li><span class="k">FOCUS</span><span class="v">Data Analysis &amp; BI</span></li>
+        <li><span class="k">STATUS</span><span class="v">Open to opportunities</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="skills">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">02 · Skills</div>
+      <h2>Technical Schema</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="schema">
+      <div class="schema-row">
+        <div class="schema-key">programming</div>
+        <div class="schema-val">
+          <span class="tag">Python</span><span class="tag">SQL</span><span class="tag">EDA</span>
+          <span class="tag">Power BI</span><span class="tag">Advanced Excel</span>
+        </div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-key">libraries</div>
+        <div class="schema-val">
+          <span class="tag">Pandas</span><span class="tag">NumPy</span><span class="tag">Matplotlib</span><span class="tag">Seaborn</span>
+        </div>
+      </div>
+      <div class="schema-row">
+        <div class="schema-key">tools &amp; db</div>
+        <div class="schema-val">
+          <span class="tag">MySQL (RDBMS)</span><span class="tag">Jupyter Notebook</span><span class="tag">VS Code</span>
+          <span class="tag">MS Excel</span><span class="tag">Microsoft Power BI</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">03 · Projects</div>
+      <h2>Selected Work</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="projects">
+
+      <div class="project-card reveal" data-depth="1">
+         <button class="expand-btn" aria-label="Expand project details" type="button"><i class="fa-solid fa-plus"></i></button>
+        <div class="card-strip"></div>
+        <div class="card-body">
+          <h3>Library Management System</h3>
+          <ul>
+            <li>Built a SQL-based system to manage books, members, authors, publishers, and borrowing transactions through a structured relational database.</li>
+            <li>Applied joins, subqueries, views, aggregate functions, and constraints to support reporting and data integrity.</li>
+          </ul>
+          <div class="card-tags"><span>SQL</span><span>Excel</span><span>MySQL Workbench</span></div>
+          <a class="card-link" href="https://github.com/Santanperumalla/Library-Management-System---SQL-Project.git" target="_blank">View on GitHub →</a>
+          <div class="project-extra"><p><strong>3D detail:</strong> Relational data modeling, integrity constraints, reporting queries, and transaction workflows were structured for practical library operations.</p></div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" data-depth="1">
+         <button class="expand-btn" aria-label="Expand project details" type="button"><i class="fa-solid fa-plus"></i></button>
+        <div class="card-strip"></div>
+        <div class="card-body">
+          <h3>Global Video Game Sales Intelligence Dashboard</h3>
+          <ul>
+            <li>Cleaned and explored video game sales data with Python-based EDA to surface sales trends, regional performance, and genre popularity.</li>
+            <li>Structured the cleaned dataset into a SQL database and built an interactive Power BI dashboard with KPIs and dynamic filters.</li>
+          </ul>
+          <div class="card-tags"><span>Python</span><span>EDA</span><span>SQL</span><span>Power BI</span><span>Excel</span></div>
+          <a class="card-link" href="https://github.com/Santanperumalla/Global-Video-Game-Sales-Intelligence-Dashboard.git" target="_blank">View on GitHub →</a>
+          <div class="project-extra"><p><strong>3D detail:</strong> The analytics workflow connects Python EDA, SQL data modeling, and Power BI storytelling into one end-to-end decision-support pipeline.</p></div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" data-depth="1">
+         <button class="expand-btn" aria-label="Expand project details" type="button"><i class="fa-solid fa-plus"></i></button>
+        <div class="card-strip"></div>
+        <div class="card-body">
+          <h3>PhonePe Analysis Dashboard</h3>
+          <ul>
+            <li>Built an interactive Power BI dashboard analyzing PhonePe transaction and user data across states and time periods.</li>
+            <li>Cleaned raw data with Power Query and designed dynamic KPIs to visualize transaction trends and regional performance.</li>
+          </ul>
+          <div class="card-tags"><span>Power BI</span><span>Excel</span></div>
+          <a class="card-link" href="https://github.com/Santanperumalla/PhonePe-Analysis---Dashboard.git" target="_blank">View on GitHub →</a>
+          <div class="project-extra"><p><strong>3D detail:</strong> Dynamic KPIs and regional/time analysis turn transaction data into an interactive business intelligence view.</p></div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" data-depth="1">
+         <button class="expand-btn" aria-label="Expand project details" type="button"><i class="fa-solid fa-plus"></i></button>
+        <div class="card-strip"></div>
+        <div class="card-body">
+          <h3>Big-Basket Products Analysis</h3>
+          <ul>
+            <li>Cleaned and prepared a 27K+ product dataset using Python and Pandas for accurate analysis.</li>
+            <li>Performed EDA to study product categories, prices, discounts, brands, and customer ratings, creating visualizations to surface trends for better decision-making.</li>
+          </ul>
+          <div class="card-tags"><span>Python</span><span>Pandas</span><span>EDA</span></div>
+          <a class="card-link" href="https://github.com/Santanperumalla/Big-Basket-Products-analysis.git" target="_blank">View on GitHub →</a>
+          <div class="project-extra"><p><strong>3D detail:</strong> Product-level cleaning and EDA reveal category, price, discount, brand, and rating patterns across 27K+ records.</p></div>
+        </div>
+      </div>
+
+      <div class="project-card reveal" data-depth="5">
+        <button class="expand-btn" aria-label="Expand project details" type="button"><i class="fa-solid fa-plus"></i></button>
+        <div class="card-strip"></div>
+        <div class="card-body">
+          <h3>Heart Failure Patient Survival Analysis &amp; Interactive Healthcare Dashboard using Microsoft Excel</h3>
+          <ul>
+            <li>Analyzed 299 heart failure patient records to identify survival trends and key clinical risk factors, including age, diabetes, smoking, blood pressure, ejection fraction, and kidney function.</li>
+            <li>Cleaned and structured healthcare data, then built an interactive Excel dashboard using Pivot Tables, Pivot Charts, KPI Cards, and formulas.</li>
+            <li>Translated findings into clear visual insights to support data-driven healthcare decision-making.</li>
+          </ul>
+          <div class="card-tags"><span>Microsoft Excel</span><span>Pivot Tables</span><span>Pivot Charts</span><span>KPI Cards</span><span>Healthcare Analytics</span></div>
+          <a class="card-link" href="https://github.com/Santanperumalla/Heart-Failure-Patient-Survival-Analysis-Healthcare-Dashboard-using-Microsoft-Excel" target="_blank" rel="noopener">View on GitHub →</a>
+          <div class="project-extra"><p><strong>3D detail:</strong> A healthcare analytics case study combining structured cleaning, survival-focused analysis, and an interactive Excel reporting layer.</p></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">04 · Experience</div>
+      <h2>Internships</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="date">JULY 2025 — JUN 2026</div>
+        <h3>Data Science with Gen AI (Corporate Training)</h3>
+        <div class="org">Innomatics Research Labs, Hyderabad</div>
+        <ul>
+          <li>Learned data cleaning, preprocessing, and exploratory data analysis using Python, SQL, Pandas, and Excel.</li>
+          <li>Built interactive Power BI dashboards to visualize data and business metrics.</li>
+          <li>Completed hands-on training in Data Science, Machine Learning, and Generative AI, building ML models with Pandas, NumPy, and Scikit-learn.</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <div class="date">FEB 2025 — AUG 2025</div>
+        <h3>CCNA Training</h3>
+        <div class="org">IIHT Ltd., Chennai</div>
+        <ul>
+          <li>Gained knowledge of computer hardware, hardware installation, and troubleshooting techniques.</li>
+          <li>Learned networking fundamentals including cables, devices, and crimping techniques.</li>
+          <li>Acquired foundational CCNA networking concepts and practiced router/switch configuration using Cisco Packet Tracer.</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <div class="date">JUN 2024 — JUN 2024</div>
+        <h3>Summer Intern</h3>
+        <div class="org">Microlink Information Technologies</div>
+        <ul>
+          <li>Acquired hands-on experience in embedded system design and prototyping using Arduino UNO.</li>
+          <li>Programmed the microcontroller with the Arduino IDE in embedded C to interface with sensors and actuators.</li>
+          <li>Designed and built a functional prototype demonstrating core embedded principles.</li>
+        </ul>
+      </div>
+      <div class="timeline-item">
+        <div class="date">MAY 2023 — JUN 2023</div>
+        <h3>Summer Intern (Virtual)</h3>
+        <div class="org">Cisco Networking Academy</div>
+        <ul>
+          <li>Completed a 30-day virtual internship on networking fundamentals organized by Cisco.</li>
+          <li>Learned to connect network-layer and end devices using different cable types.</li>
+          <li>Configured routers and IP addressing with routing techniques in Cisco Packet Tracer.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="education-certs">
+  <div class="container">
+    <div class="two-col">
+      <div>
+        <div class="section-head">
+          <div class="section-tag">05 · Education</div>
+          <h2>Academics</h2>
+          <div class="section-line"></div>
+        </div>
+        <div class="edu-item">
+          <h3>Sri Sairam Institute of Technology, Chennai</h3>
+          <div class="meta">B.E — Electronics &amp; Communication Engineering · 2022–2025</div>
+          <div class="score">CGPA: 6.5 / 10</div>
+        </div>
+        <div class="edu-item">
+          <h3>DVR &amp; Dr. H.S. MIC College of Technology, Kanchikacherla</h3>
+          <div class="meta">Diploma — Electronics &amp; Communication Engineering · 2019–2022</div>
+          <div class="score">Score: 73.94%</div>
+        </div>
+      </div>
+      <div>
+        <div class="section-head">
+          <div class="section-tag">06 · Certifications</div>
+          <h2>Credentials</h2>
+          <div class="section-line"></div>
+        </div>
+        <div class="cert-list">
+          <div class="cert-item reveal"><span class="bullet">//</span> Python Programming <span class="issuer">Innomatics Research Labs · ID: M_202255</span><a class="cert-link" href="https://drive.google.com/file/d/1c8untIsp_6M-3WTuY5wlc4fxaAI-28p4/view?usp=sharing" target="_blank" rel="noopener"><i class="fa-solid fa-certificate"></i> View</a></div>
+          <div class="cert-item reveal"><span class="bullet">//</span> Exploratory Data Analysis <span class="issuer">Innomatics Research Labs · ID: M_204468</span><a class="cert-link" href="https://drive.google.com/file/d/1mbn4UCxN9NHaByX8NANQ3BOKNOEcfBSJ/view?usp=sharing" target="_blank" rel="noopener"><i class="fa-solid fa-certificate"></i> View</a></div>
+          <div class="cert-item reveal"><span class="bullet">//</span> Data Analysis with MySQL <span class="issuer">Innomatics Research Labs · ID: M_204467</span><a class="cert-link" href="https://drive.google.com/file/d/1ogdx0sYF5HrQXyi8w_syONdPqIM8_foJ/view?usp=sharing" target="_blank" rel="noopener"><i class="fa-solid fa-certificate"></i> View</a></div>
+          <div class="cert-item reveal"><span class="bullet">//</span> Power BI <span class="issuer">Innomatics Research Labs · ID: M_204466</span><a class="cert-link" href="https://drive.google.com/file/d/1Q1fqh7zg1OJ1HvzYYg1Dyoz9DkZtPPkw/view?usp=sharing" target="_blank" rel="noopener"><i class="fa-solid fa-certificate"></i> View</a></div>
+          <div class="cert-item reveal"><span class="bullet">//</span> Computer Hardware Basics <span class="issuer">Cisco Networking Academy</span><a class="cert-link" href="https://drive.google.com/file/d/1quFzcdSha56i2zOmCOOgQfr8rgzoRRg3/view?usp=sharing" target="_blank" rel="noopener"><i class="fa-solid fa-certificate"></i> View</a></div>
+          <div class="cert-item reveal"><span class="bullet">//</span> Computer Networks &amp; Internet Protocol <span class="issuer">NPTEL (Elite) · ID: NPTEL24CS19S353401131</span><a class="cert-link" href="https://drive.google.com/file/d/1Xc994BZF0XMDfA51TG6XPaglPePJwbxr/view?usp=sharing" target="_blank" rel="noopener"><i class="fa-solid fa-certificate"></i> View</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="resume">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-tag">07 · Resume</div>
+      <h2>Full Resume</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="resume-block">
+      <div>
+        <p style="color:#c3ccd6; font-size:15.5px; margin-bottom:24px;">Prefer a classic, printable format? Preview the full resume below or download the PDF to share with recruiters.</p>
+        <a href="Santan_Perumalla_Resume.pdf" download class="btn btn-primary">⬇ Download Resume (PDF)</a>
+      </div>
+      <div class="resume-preview">
+        <img src="resume-preview.png" alt="SANTAN PERUMALLA resume preview">
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="contact">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="logo">SANTAN<span>.PERUMALLA</span></div>
+        <p style="color:var(--muted); font-size:13.5px; margin-top:10px; max-width:320px;">Aspiring Data Analyst — open to entry-level roles in data analysis, BI reporting, and analytics.</p>
+      </div>
+      <div class="footer-links">
+        <a class="icon-link" href="mailto:santhannarayanasai12@gmail.com"><i class="fa-solid fa-envelope"></i>Gmail</a>
+        <a class="icon-link" href="https://www.linkedin.com/in/santan-perumalla-813053252" target="_blank"><i class="fa-brands fa-linkedin"></i>LinkedIn</a>
+        <a class="icon-link" href="https://github.com/Santanperumalla" target="_blank"><i class="fa-brands fa-github"></i>GitHub</a>
+        <span class="location"><i class="fa-solid fa-location-dot"></i>Vijayawada, India</span>
+      </div>
+    </div>
+    <div class="footer-note">© 2026 SANTAN NARAYANA SAI PERUMALLA — built with data, curiosity, and a lot of SQL joins.</div>
+  </div>
+</footer>
+
+<script>
+/* Terminal typing */
+const query = `SELECT name, role, core_skills
+  FROM analysts
+ WHERE ready_to_hire = TRUE;`;
+const el = document.getElementById('typedQuery');
+const cursor = document.getElementById('cursorBlink');
+const resultTable = document.getElementById('resultTable');
+let i=0;
+function type(){
+  if(i<=query.length){el.textContent=query.slice(0,i++);setTimeout(type,22)}
+  else{cursor.style.display='none';resultTable.style.opacity='1'}
+}
+type();
+
+/* Project expand/collapse */
+document.querySelectorAll('.project-card').forEach(card=>{
+  const button=card.querySelector('.expand-btn');
+  if(button){
+    button.addEventListener('click',e=>{
+      e.stopPropagation();
+      card.classList.toggle('expanded');
+    });
+  }
+  card.addEventListener('click',e=>{
+    if(e.target.closest('a') || e.target.closest('button')) return;
+    card.classList.toggle('expanded');
+  });
+});
+
+/* High-quality pointer tilt for every major 3D card */
+function add3DTilt(selector,maxTilt=7){
+  document.querySelectorAll(selector).forEach(card=>{
+    card.addEventListener('pointermove',e=>{
+      if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+      const r=card.getBoundingClientRect();
+      const x=(e.clientX-r.left)/r.width-.5, y=(e.clientY-r.top)/r.height-.5;
+      const rx=-y*maxTilt, ry=x*maxTilt;
+      const z=card.classList.contains('project-card')?16:9;
+      card.style.transform=`perspective(1200px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(${z}px) translateY(-4px)`;
+    });
+    card.addEventListener('pointerleave',()=>{
+      if(card.classList.contains('project-card')){
+        card.style.transform='';
+      }else{
+        card.style.transform='';
+      }
+    });
+  });
+}
+add3DTilt('.project-card',8);
+add3DTilt('.cert-item',5);
+add3DTilt('.terminal',4);
+add3DTilt('.schema',3);
+add3DTilt('.resume-preview',4);
+
+/* Scroll reveal */
+const revealObserver=new IntersectionObserver(entries=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){entry.target.classList.add('visible');revealObserver.unobserve(entry.target)}
+  });
+},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
+
+/* Floating query slabs: subtle scroll-driven parallax and rotation */
+const slabs=[...document.querySelectorAll('.query-slab')];
+function animateSlabs(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const viewportCenter=window.innerHeight*.55;
+  slabs.forEach((slab,index)=>{
+    const r=slab.getBoundingClientRect();
+    const distance=(r.top+r.height/2-viewportCenter)/window.innerHeight;
+    const baseX=-50+index*2;
+    const y=-50+index*8;
+    const z=80-index*45-distance*120;
+    const rx=8-index*4-distance*7;
+    const ry=(index%2?-1:1)*(10-index*2)+distance*5;
+    slab.style.transform=`translate(${baseX}% , ${y}%) translateZ(${z}px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+  });
+}
+window.addEventListener('scroll',animateSlabs,{passive:true});
+animateSlabs();
+
+/* Three.js particle + wireframe data environment */
+(function(){
+  const canvas=document.getElementById('three-bg');
+  if(!canvas || window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const script=document.createElement('script');
+  script.src='https://cdn.jsdelivr.net/npm/three@0.166.1/build/three.min.js';
+  script.onload=()=>{
+    const THREE=window.THREE;
+    const scene=new THREE.Scene();
+    scene.fog=new THREE.FogExp2(0x05070b,.035);
+    const camera=new THREE.PerspectiveCamera(55,innerWidth/innerHeight,.1,200);
+    camera.position.set(0,1.8,14);
+    const renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true});
+    renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));
+    renderer.setSize(innerWidth,innerHeight);
+
+    const group=new THREE.Group();
+    scene.add(group);
+
+    /* Point cloud */
+    const count=900;
+    const positions=new Float32Array(count*3);
+    const colors=new Float32Array(count*3);
+    for(let j=0;j<count;j++){
+      const radius=18*Math.sqrt(Math.random());
+      const angle=Math.random()*Math.PI*2;
+      positions[j*3]=Math.cos(angle)*radius;
+      positions[j*3+1]=(Math.random()-.5)*12;
+      positions[j*3+2]=Math.sin(angle)*radius-8;
+      const c=Math.random();
+      colors[j*3]=c*.2;
+      colors[j*3+1]=.45+c*.45;
+      colors[j*3+2]=.55+c*.35;
+    }
+    const geo=new THREE.BufferGeometry();
+    geo.setAttribute('position',new THREE.BufferAttribute(positions,3));
+    geo.setAttribute('color',new THREE.BufferAttribute(colors,3));
+    const mat=new THREE.PointsMaterial({size:.055,vertexColors:true,transparent:true,opacity:.7});
+    group.add(new THREE.Points(geo,mat));
+
+    /* Floating analytical wireframe */
+    const torus=new THREE.Mesh(
+      new THREE.TorusKnotGeometry(2.5,.035,160,8,2,3),
+      new THREE.MeshBasicMaterial({color:0x2dd4bf,wireframe:true,transparent:true,opacity:.14})
+    );
+    torus.position.set(5,1,-7); group.add(torus);
+
+    const sphere=new THREE.Mesh(
+      new THREE.IcosahedronGeometry(2.2,2),
+      new THREE.MeshBasicMaterial({color:0x8b83ff,wireframe:true,transparent:true,opacity:.10})
+    );
+    sphere.position.set(-5,-1,-9); group.add(sphere);
+
+    /* Perspective analytics grid */
+    const grid=new THREE.GridHelper(80,40,0x2dd4bf,0x2dd4bf);
+    grid.material.transparent=true;grid.material.opacity=.055;
+    grid.position.y=-5;grid.rotation.x=.08;scene.add(grid);
+
+    const mouse={x:0,y:0};
+    window.addEventListener('pointermove',e=>{
+      mouse.x=(e.clientX/innerWidth-.5);
+      mouse.y=(e.clientY/innerHeight-.5);
+    },{passive:true});
+
+    function resize(){
+      camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth,innerHeight);
+    }
+    window.addEventListener('resize',resize);
+
+    let t=0;
+    function animate(){
+      requestAnimationFrame(animate);t+=.0025;
+      group.rotation.y=t*.18;
+      group.rotation.x=Math.sin(t)*.025;
+      torus.rotation.x+=.0015;torus.rotation.y+=.0025;
+      sphere.rotation.x-=.001; sphere.rotation.y+=.0018;
+      camera.position.x+=(mouse.x*1.2-camera.position.x)*.025;
+      camera.position.y+=(1.8-mouse.y*.8-camera.position.y)*.025;
+      camera.lookAt(0,0,-6);
+      renderer.render(scene,camera);
+    }
+    animate();
+  };
+  document.head.appendChild(script);
+})();
+</script>
+
+</body>
+</html>
